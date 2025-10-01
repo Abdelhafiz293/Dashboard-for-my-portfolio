@@ -1,0 +1,385 @@
+<div class="admin-dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Admin Dashboard</h1>
+      <div class="user-info">
+        <span
+          >Welcome,
+          {{ getCurrentUser()?.name || getCurrentUser()?.email }}</span
+        >
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="dashboard-nav">
+    <button
+      class="nav-tab"
+      [class.active]="activeTab === 'overview'"
+      (click)="setActiveTab('overview')"
+    >
+      📊 Overview
+    </button>
+    <button
+      class="nav-tab"
+      [class.active]="activeTab === 'skills'"
+      (click)="setActiveTab('skills')"
+    >
+      🎯 Skills
+    </button>
+    <button
+      class="nav-tab"
+      [class.active]="activeTab === 'projects'"
+      (click)="setActiveTab('projects')"
+    >
+      💼 Projects
+    </button>
+    <button
+      class="nav-tab"
+      [class.active]="activeTab === 'about'"
+      (click)="setActiveTab('about')"
+    >
+      👤 About
+    </button>
+    <button
+      class="nav-tab"
+      [class.active]="activeTab === 'contacts'"
+      (click)="setActiveTab('contacts')"
+    >
+      📩 Contacts
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <!-- Message Display -->
+    <div
+      class="message"
+      *ngIf="message"
+      [class.error]="message.includes('Error')"
+    >
+      {{ message }}
+    </div>
+
+    <!-- Overview Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'overview'">
+      <div class="overview-grid">
+        <div class="stat-card">
+          <h3>Total Skills</h3>
+          <p class="stat-number">{{ skills.length }}</p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Projects</h3>
+          <p class="stat-number">{{ projects.length }}</p>
+        </div>
+        <div class="stat-card">
+          <h3>Contact Messages</h3>
+          <p class="stat-number">{{ contacts.length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Management Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'skills'">
+      <div class="content-section">
+        <h2>{{ editingSkill ? "Edit Skill" : "Add New Skill" }}</h2>
+
+        <form
+          [formGroup]="skillForm"
+          (ngSubmit)="onSubmitSkill()"
+          class="admin-form"
+        >
+          <div class="form-group">
+            <label for="skillName">Skill Name</label>
+            <input
+              type="text"
+              id="skillName"
+              formControlName="name"
+              placeholder="e.g., JavaScript"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="skillLevel">Level </label>
+            <input
+              type="text"
+              id="skillLevel"
+              formControlName="level"
+              placeholder="fair"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="skillCategory">Category</label>
+            <input
+              type="text"
+              id="skillCategory"
+              formControlName="category"
+              placeholder="e.g., Frontend"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="skillIconUrl">Icon URL (optional)</label>
+            <input
+              type="url"
+              id="skillIconUrl"
+              formControlName="iconUrl"
+              placeholder="https://example.com/icon.svg"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              [disabled]="isLoading || skillForm.invalid"
+              class="submit-btn"
+            >
+              {{ editingSkill ? "Update" : "Add" }} Skill
+            </button>
+            <button
+              type="button"
+              (click)="resetSkillForm()"
+              class="cancel-btn"
+              *ngIf="editingSkill"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Skills List -->
+      <div class="content-section">
+        <h2>Skills List</h2>
+        <div class="items-grid">
+          <div class="item-card" *ngFor="let skill of skills">
+            <div class="skill-header" *ngIf="skill.iconUrl">
+              <img
+                [src]="skill.iconUrl"
+                [alt]="skill.name"
+                class="skill-icon"
+                (error)="onImageError($event)"
+                loading="lazy"
+              />
+            </div>
+            <h3>{{ skill.name }}</h3>
+            <p><strong>Level:</strong> {{ skill.level }}</p>
+            <p><strong>Category:</strong> {{ skill.category || "General" }}</p>
+            <div class="item-actions">
+              <button (click)="editSkill(skill)" class="edit-btn">Edit</button>
+              <button (click)="deleteSkill(skill._id)" class="delete-btn">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects Management Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'projects'">
+      <div class="content-section">
+        <h2>{{ editingProject ? "Edit Project" : "Add New Project" }}</h2>
+
+        <form
+          [formGroup]="projectForm"
+          (ngSubmit)="onSubmitProject()"
+          class="admin-form"
+        >
+          <div class="form-group">
+            <label for="projectTitle">Project Title</label>
+            <input
+              type="text"
+              id="projectTitle"
+              formControlName="title"
+              placeholder="My Awesome Project"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="projectDescription">Description</label>
+            <textarea
+              id="projectDescription"
+              formControlName="description"
+              placeholder="Describe your project..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="projectTech">Technologies</label>
+            <input
+              type="text"
+              id="projectTech"
+              formControlName="technologies"
+              placeholder="Angular, Node.js, MongoDB"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="projectImageUrl">Image URL</label>
+            <input
+              type="url"
+              id="projectImageUrl"
+              formControlName="imageUrl"
+              placeholder="https://example.com/project-image.jpg"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="projectLink">Project Link</label>
+            <input
+              type="url"
+              id="projectLink"
+              formControlName="link"
+              placeholder="https://myproject.com"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              [disabled]="isLoading || projectForm.invalid"
+              class="submit-btn"
+            >
+              {{ editingProject ? "Update" : "Add" }} Project
+            </button>
+            <button
+              type="button"
+              (click)="resetProjectForm()"
+              class="cancel-btn"
+              *ngIf="editingProject"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Projects List -->
+      <div class="content-section">
+        <h2>Projects List</h2>
+        <div class="items-grid">
+          <div class="item-card" *ngFor="let project of projects">
+            <div class="project-image-container" *ngIf="project.imageUrl">
+              <img
+                [src]="project.imageUrl"
+                [alt]="project.title"
+                class="project-image"
+                (error)="onImageError($event)"
+                loading="lazy"
+              />
+            </div>
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description }}</p>
+            <p>
+              <strong>Technologies:</strong>
+              {{ project.technologies?.join(", ") }}
+            </p>
+            <div class="item-actions">
+              <button (click)="editProject(project)" class="edit-btn">
+                Edit
+              </button>
+              <button (click)="deleteProject(project._id)" class="delete-btn">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Management Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'about'">
+      <div class="content-section">
+        <h2>About Information</h2>
+
+        <form
+          [formGroup]="aboutForm"
+          (ngSubmit)="onSubmitAbout()"
+          class="admin-form"
+        >
+          <div class="form-group">
+            <label for="aboutDescription">About Description</label>
+            <textarea
+              id="aboutDescription"
+              formControlName="description"
+              rows="6"
+              placeholder="Tell visitors about yourself..."
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              [disabled]="isLoading || aboutForm.invalid"
+              class="submit-btn"
+            >
+              Update About
+            </button>
+          </div>
+        </form>
+
+        <!-- Profile Image Upload -->
+        <div class="upload-section">
+          <h3>Profile Image</h3>
+          <div class="current-image" *ngIf="aboutInfo?.profileImageUrl">
+            <img
+              [src]="aboutInfo.profileImageUrl"
+              alt="Current profile image"
+              class="profile-preview"
+              (error)="onImageError($event)"
+              loading="lazy"
+            />
+          </div>
+          <div class="upload-form">
+            <input
+              type="file"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              #fileInput
+            />
+            <button
+              (click)="uploadProfileImage()"
+              [disabled]="!selectedFile || isLoading"
+              class="upload-btn"
+            >
+              Upload New Image
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacts Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'contacts'">
+      <div class="content-section">
+        <h2>Contact Messages</h2>
+        <div class="contacts-list">
+          <div class="contact-card" *ngFor="let contact of contacts">
+            <div class="contact-header">
+              <h3>{{ contact.name }}</h3>
+              <button
+                class="delete-btn"
+                (click)="deleteContact(contact._id)"
+                title="Delete contact message"
+              >
+                🗑️ Delete
+              </button>
+            </div>
+            <p><strong>Email:</strong> {{ contact.email }}</p>
+            <p><strong>Message:</strong> {{ contact.message }}</p>
+            <p>
+              <strong>Date:</strong> {{ contact.createdAt | date : "medium" }}
+            </p>
+          </div>
+          <div *ngIf="contacts.length === 0" class="no-data">
+            No contact messages yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

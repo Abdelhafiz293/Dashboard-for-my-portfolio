@@ -1,0 +1,98 @@
+<div class="login-container">
+  <div class="login-card">
+    <!-- Header -->
+    <div class="login-header">
+      <h1>Admin Login</h1>
+      <p>Sign in to your admin dashboard</p>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-input"
+            [class.error]="email?.invalid && email?.touched"
+            placeholder="Enter your email"
+            (input)="clearError()"
+          />
+            <span class="icon email-icon">📧</span>
+
+        </div>
+
+        <!-- Email Validation Errors -->
+        <div class="error-messages" *ngIf="email?.invalid && email?.touched">
+          <small *ngIf="email?.errors?.['required']">Email is required</small>
+          <small *ngIf="email?.errors?.['email']"
+            >Please enter a valid email</small
+          >
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-input"
+            [class.error]="password?.invalid && password?.touched"
+            placeholder="Enter your password"
+            (input)="clearError()"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+          >
+            {{ showPassword ? "👁️" : "🫣" }}
+          </button>
+        </div>
+
+        <!-- Password Validation Errors -->
+        <div
+          class="error-messages"
+          *ngIf="password?.invalid && password?.touched"
+        >
+          <small *ngIf="password?.errors?.['required']"
+            >Password is required</small
+          >
+          <small *ngIf="password?.errors?.['minlength']"
+            >Password must be at least 6 characters</small
+          >
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="general-error" *ngIf="errorMessage">
+        <p>Login Failed!</p>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="login-btn"
+        [disabled]="isLoading"
+        [class.loading]="isLoading"
+      >
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading">
+          <span class="loading-spinner">𖦹</span>
+          Signing In...
+        </span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>Secure admin access only</p>
+    </div>
+  </div>
+</div>
