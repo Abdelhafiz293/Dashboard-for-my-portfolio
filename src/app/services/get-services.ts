@@ -49,9 +49,39 @@ export class GetServices {
 
   // Helper method to fix image URLs
   private fixImageUrl(url: string): string {
-    if (url && url.includes('localhost:5000')) {
-      return url.replace('http://localhost:5000', this.serverUrl);
+    if (!url) {
+      return 'https://via.placeholder.com/150?text=No+Image';
     }
+    
+    if (url.includes('localhost:5000')) {
+      // For now, since images don't exist on deployed backend, use placeholders
+      // Later this should be replaced with Cloudinary URLs
+      const filename = url.split('/').pop();
+      
+      // Return placeholder images based on the context
+      if (filename?.includes('788793496')) { // JavaScript
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg';
+      } else if (filename?.includes('668778363')) { // HTML5
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg';
+      } else if (filename?.includes('668456931')) { // CSS3
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg';
+      } else if (filename?.includes('834729533')) { // Bootstrap
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg';
+      } else if (filename?.includes('880086980')) { // Node.js
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg';
+      } else if (filename?.includes('911281296')) { // Express.js
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg';
+      } else if (filename?.includes('831597193')) { // MongoDB
+        return 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg';
+      } else if (filename?.includes('220662758')) { // Project image
+        return 'https://via.placeholder.com/400x250?text=Project+Screenshot';
+      } else if (filename?.includes('745640026')) { // Profile image
+        return 'https://via.placeholder.com/300x300?text=Profile+Photo';
+      } else {
+        return 'https://via.placeholder.com/150?text=Image';
+      }
+    }
+    
     return url;
   }
 
@@ -62,7 +92,7 @@ export class GetServices {
         if (response.skills) {
           response.skills = response.skills.map((skill: any) => ({
             ...skill,
-            iconUrl: this.fixImageUrl(skill.iconUrl)
+            iconUrl: this.fixImageUrl(skill.iconUrl),
           }));
         }
         return response;
@@ -74,7 +104,7 @@ export class GetServices {
     return this.http.get(`${this.baseUrl}/skills/${id}`).pipe(
       map((response: any) => ({
         ...response,
-        iconUrl: this.fixImageUrl(response.iconUrl)
+        iconUrl: this.fixImageUrl(response.iconUrl),
       }))
     );
   }
@@ -86,7 +116,7 @@ export class GetServices {
         if (response.allProjects) {
           response.allProjects = response.allProjects.map((project: any) => ({
             ...project,
-            imageUrl: this.fixImageUrl(project.imageUrl)
+            imageUrl: this.fixImageUrl(project.imageUrl),
           }));
         }
         return response;
@@ -98,7 +128,7 @@ export class GetServices {
     return this.http.get(`${this.baseUrl}/projects/${id}`).pipe(
       map((response: any) => ({
         ...response,
-        imageUrl: this.fixImageUrl(response.imageUrl)
+        imageUrl: this.fixImageUrl(response.imageUrl),
       }))
     );
   }
@@ -108,7 +138,9 @@ export class GetServices {
     return this.http.get(`${this.baseUrl}/about`).pipe(
       map((response: any) => {
         if (response.data && response.data.profileImageUrl) {
-          response.data.profileImageUrl = this.fixImageUrl(response.data.profileImageUrl);
+          response.data.profileImageUrl = this.fixImageUrl(
+            response.data.profileImageUrl
+          );
         }
         return response;
       })
