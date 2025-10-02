@@ -41,7 +41,7 @@ export interface Contact {
   providedIn: 'root',
 })
 export class GetServices {
-  private baseUrl = 'http://localhost:5000/api'; // Your backend URL
+  private baseUrl = 'https://backend-for-abdelhafiz-portfolio.vercel.app/api'; // Your deployed backend URL
 
   constructor(private http: HttpClient) {}
 

@@ -39,7 +39,8 @@ export interface User {
   providedIn: 'root',
 })
 export class Auth {
-  private baseUrl = 'http://localhost:5000/api/auth';
+  private baseUrl =
+    'https://backend-for-abdelhafiz-portfolio.vercel.app/api/auth';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private sessionTimeoutId: any = null;

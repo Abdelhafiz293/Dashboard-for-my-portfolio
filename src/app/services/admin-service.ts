@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AdminService {
-  private baseUrl = 'http://localhost:5000/api';
+  private baseUrl = 'https://backend-for-abdelhafiz-portfolio.vercel.app/api';
 
   constructor(private http: HttpClient) {}
 
